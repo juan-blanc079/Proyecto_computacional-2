@@ -5,9 +5,8 @@ from numpy import pi
 #Constantes
 C = 26.24
 D = 1.44
-tiempo = np.linspace(0, 0.001, 30000)
-dt = tiempo[1] - tiempo[0]
-Total_energy = -13.6
+tiempo = np.linspace(0,1000,10000)
+dx = 0.001
 
 #Funciones
 
@@ -19,21 +18,24 @@ def wave_function(particle):
     history = []
 
     for i in range(len(tiempo)):
-        
+
+        x = particle["x"]
         yi_0 = particle["y_0"]
-        values = np.array([i,yi_0])
+        values = np.array([x,yi_0])
+        total_energy = particle["energy"]
         yi_1 = particle["y_1"]
 
         history.append(values)
 
-        Potential_energy = potential_energy(i)
+        Potential_energy = potential_energy(x)
 
-        y_2 = -C * (Total_energy - Potential_energy) * yi_0
-        y_1 = yi_1+ y_2 * dt
-        y_0 = yi_0 + y_1 * dt
+        y_2 = -C * (total_energy - Potential_energy) * yi_0
+        y_1 = yi_1+ y_2 * dx
+        y_0 = yi_0 + y_1 * dx
 
         particle["y_0"] = y_0
         particle["y_1"] = y_1 
+        particle["x"] = x + dx
     
     particle["history"] = history
 
@@ -41,7 +43,7 @@ def wave_function(particle):
 
 #Gráficas
 
-def graphs(initial_conditions):
+def graphs(initial_conditions, energy_levels):
 
     y_0 = initial_conditions[0]
     y_1 = initial_conditions[1]
@@ -50,10 +52,15 @@ def graphs(initial_conditions):
     plt.title("Función de Onda")
     plt.xlabel("x (m)")
     plt.ylabel("f(x) (m)")
+    plt.ylim(-0.1, 0.1)
+    plt.xlim(-0.01, 0.8)
 
-    for i in range(0,5):
+    for i in range(len(energy_levels)):
 
+        energy = energy_levels[i]
         particle={"id": i,
+                  "x": 0,
+                  "energy": energy,
                   "y_0": y_0,
                   "y_1": y_1}
         
@@ -62,10 +69,16 @@ def graphs(initial_conditions):
         history = particle["history"]
         xs = [p[0] for p in history]
         ys = [p[1] for p in history]
-        plt.scatter(xs, ys, s=2, alpha=0.7, label=f"b={i:.1e} m")
+        plt.scatter(xs, ys, s=2, alpha=0.7, label=f"E={energy_levels[i]} eV")
+
+    plt.legend()
+    plt.grid(True)
+    plt.show()
+    
 
 #Iniciación
 
-initial_conditions = np.array([0,0.5]) # [f(0), f´(0)= 0.5]
+initial_conditions = np.array([0,0.5]) # [f(0), f´(0)]
+energy_levels = np.array([-13.5525, -3.3945, -1.5095, -0.8494])
 
-graphs(initial_conditions)
+graphs(initial_conditions, energy_levels)
