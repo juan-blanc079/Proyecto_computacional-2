@@ -7,11 +7,27 @@ C = 26.24
 D = 1.44
 tiempo = np.linspace(0,1000,10000)
 dx = 0.001
+dx_2 = dx/2
 
 #Funciones
 
+"""def phi_function(y_0, y_1):
+    value = y_0 + y_1 * dx
+    return value
+
+def phi_derivative(y_1,y_2):
+    value = y_1 * y_2 * dx
+    return value
+
+def phi_derivative_2(E,U, y_0):
+    value = -C * (E + U) * y_0
+    return value
+
+"""
+
 def potential_energy(x):
-    return -D/x if x != 0 else 0
+    potential_energy = -D/x if x!=0 else 0
+    return potential_energy
 
 def wave_function(particle):
 
@@ -21,16 +37,16 @@ def wave_function(particle):
 
         x = particle["x"]
         yi_0 = particle["y_0"]
-        values = np.array([x,yi_0])
-        total_energy = particle["energy"]
         yi_1 = particle["y_1"]
+        values = np.array([x,yi_0])
 
         history.append(values)
 
-        Potential_energy = potential_energy(x)
+        E = particle["energy"]
+        U = potential_energy(x)
 
-        y_2 = -C * (total_energy - Potential_energy) * yi_0
-        y_1 = yi_1+ y_2 * dx
+        y_2 = -C *(E - U)*yi_0
+        y_1 = yi_1 + y_2 * dx
         y_0 = yi_0 + y_1 * dx
 
         particle["y_0"] = y_0
@@ -38,7 +54,7 @@ def wave_function(particle):
         particle["x"] = x + dx
     
     particle["history"] = history
-
+    
     return particle
 
 #Gráficas
@@ -52,8 +68,8 @@ def graphs(initial_conditions, energy_levels):
     plt.title("Función de Onda")
     plt.xlabel("x (m)")
     plt.ylabel("f(x) (m)")
-    plt.ylim(-0.1, 0.1)
-    plt.xlim(-0.01, 0.8)
+    plt.ylim(-10, 10)
+    plt.xlim(-0.01, 10)
 
     for i in range(len(energy_levels)):
 
