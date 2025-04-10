@@ -42,7 +42,7 @@ def graphs(initial_conditions, energy_levels):
     x0 = dx/2  
     psi0 = initial_conditions[1] * x0  # Aproximación: ψ(x0) ≈ ψ'(0)*x0
     psi1 = initial_conditions[1]
-    x_lims = [1.25, 2, 2.5, 3.5]
+    x_lims = [1.25, 1.8, 2.5, 3.5]
     
     for i, energy in enumerate(energy_levels):
         plt.figure(figsize=(10, 8))
