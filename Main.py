@@ -54,6 +54,7 @@ def wave_function(particle):
         particle["x"] = x + dx
     
     particle["history"] = history
+    print(history)
     
     return particle
 
