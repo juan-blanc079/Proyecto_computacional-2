@@ -2,100 +2,79 @@ import numpy as np
 import matplotlib.pyplot as plt
 from numpy import pi
 
-#Constantes
+# Constantes
 C = 26.24
 D = 1.44
-tiempo = np.linspace(0,1000,10000)
+tiempo = np.linspace(0, 1000, 10000)
 dx = 0.001
-dx_2 = dx/2
-
-#Funciones
-
-"""def phi_function(y_0, y_1):
-    value = y_0 + y_1 * dx
-    return value
-
-def phi_derivative(y_1,y_2):
-    value = y_1 * y_2 * dx
-    return value
-
-def phi_derivative_2(E,U, y_0):
-    value = -C * (E + U) * y_0
-    return value
-
-"""
 
 def potential_energy(x):
-    potential_energy = -D/x if x!=0 else 0
-    return potential_energy
+    # Se evita la singularidad en x=0; aunque se contempla que nunca se evalúa en exactamente 0
+    return -D/x if x != 0 else 0
 
 def wave_function(particle):
-
     history = []
-
     for i in range(len(tiempo)):
-
         x = particle["x"]
         yi_0 = particle["y_0"]
         yi_1 = particle["y_1"]
-        values = np.array([x,yi_0])
 
-        history.append(values)
-
+        # Se guarda el par (x, ψ)
+        history.append([x, yi_0])
+        
         E = particle["energy"]
         U = potential_energy(x)
-
-        y_2 = -C *(E - U)*yi_0
+        
+        # Ecuación de Schrödinger reescrita en forma diferencial de 2º orden:
+        y_2 = -C * (E - U) * yi_0
         y_1 = yi_1 + y_2 * dx
         y_0 = yi_0 + y_1 * dx
-
+        
         particle["y_0"] = y_0
         particle["y_1"] = y_1 
         particle["x"] = x + dx
-    
+        
     particle["history"] = history
-    print(history)
     
     return particle
 
-#Gráficas
-
 def graphs(initial_conditions, energy_levels):
-
-    y_0 = initial_conditions[0]
-    y_1 = initial_conditions[1]
-
-    plt.figure(figsize=(10, 8))
-    plt.title("Función de Onda")
-    plt.xlabel("x (m)")
-    plt.ylabel("f(x) (m)")
-    plt.ylim(-10, 10)
-    plt.xlim(-0.01, 10)
-
-    for i in range(len(energy_levels)):
-
-        energy = energy_levels[i]
-        particle={"id": i,
-                  "x": 0,
-                  "energy": energy,
-                  "y_0": y_0,
-                  "y_1": y_1}
+    # Para evitar problemas con la singularidad en x = 0, iniciamos la integración en x = dx/2
+    x0 = dx/2  
+    psi0 = initial_conditions[1] * x0  # Aproximación: ψ(x0) ≈ ψ'(0)*x0
+    psi1 = initial_conditions[1]
+    x_lims = [1.25, 1.8, 2.5, 3.5]
+    
+    for i, energy in enumerate(energy_levels):
+        plt.figure(figsize=(10, 8))
+        plt.title(f"Función de Onda para E = {energy} eV")
+        plt.xlabel("x (m)")
+        plt.ylabel("ψ(x)")
+        plt.ylim(-10, 10)
+        plt.xlim(-0.01, 10)
+        plt.grid(True)
+        
+        # Definir la partícula con las condiciones iniciales modificadas
+        particle = {
+            "id": i,
+            "x": x0,
+            "energy": energy,
+            "y_0": psi0,
+            "y_1": psi1
+        }
         
         particle = wave_function(particle)
-
         history = particle["history"]
         xs = [p[0] for p in history]
         ys = [p[1] for p in history]
-        plt.scatter(xs, ys, s=2, alpha=0.7, label=f"E={energy_levels[i]} eV")
+        plt.plot(xs, ys, lw=1, label=f"E = {energy} eV")
+        plt.legend()
+        plt.ylim(-0.05, 0.05)
+        plt.xlim(-0.05, x_lims[i])
+        plt.show()
 
-    plt.legend()
-    plt.grid(True)
-    plt.show()
-    
-
-#Iniciación
-
-initial_conditions = np.array([0,0.5]) # [f(0), f´(0)]
-energy_levels = np.array([-13.5525, -3.3945, -1.5095, -0.8494])
+# Iniciación
+initial_conditions = np.array([0, 0.5])  # [ψ(0), ψ'(0)]
+energy_levels = np.array([-13.606461780325, -3.401236, -1.511589, -0.85025])
 
 graphs(initial_conditions, energy_levels)
