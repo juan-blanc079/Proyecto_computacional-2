@@ -35,6 +35,7 @@ def wave_function(particle):
         particle["x"] = x + dx
         
     particle["history"] = history
+    
     return particle
 
 def graphs(initial_conditions, energy_levels):
